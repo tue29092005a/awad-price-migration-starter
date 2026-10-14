@@ -24,3 +24,6 @@ columns                id, name, price, price_vnd rows                   22747 p
 
 === Step 3: Backfill (scripts/backfill.js completed under traffic) ===
 columns                id, name, price, price_vnd rows                   60729 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
+
+=== Step 4: Read New Column (v3 deployed on both instances) ===
+columns                id, name, price, price_vnd rows                   61998 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT

@@ -53,6 +53,13 @@ test('POST /orders totals at the current price', async () => {
   assert.deepEqual(r, { status: 201, body: { id: 1, total: 98.5 } });
 });
 
+test('v3 reads directly from price_vnd', async () => {
+  const r = await call('GET', '/menu/2');
+  assert.equal(r.status, 200);
+  assert.equal(r.body.priceVnd, 7500);
+  assert.equal(r.body.price, 7.5);
+});
+
 test('errors have one shape', async () => {
   assert.deepEqual((await call('GET', '/menu/999')).body.error, 'not_found');
   assert.equal((await call('PATCH', '/menu/1', { price: -1 })).status, 400);

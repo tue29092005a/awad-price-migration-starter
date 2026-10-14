@@ -39,20 +39,24 @@ function parsePrice(body) {
 
 export function createApp(db) {
   const q = {
-    list: db.prepare('SELECT id, name, price FROM menu_items ORDER BY id LIMIT ? OFFSET ?'),
-    get: db.prepare('SELECT id, name, price FROM menu_items WHERE id = ?'),
+    list: db.prepare('SELECT id, name, price_vnd, price FROM menu_items ORDER BY id LIMIT ? OFFSET ?'),
+    get: db.prepare('SELECT id, name, price_vnd, price FROM menu_items WHERE id = ?'),
     insert: db.prepare('INSERT INTO menu_items (name, price, price_vnd) VALUES (?, ?, ?)'),
     setPrice: db.prepare('UPDATE menu_items SET price = ?, price_vnd = ? WHERE id = ?'),
     insertOrder: db.prepare("INSERT INTO orders (created_at) VALUES (datetime('now'))"),
     insertLine: db.prepare('INSERT INTO order_items (order_id, menu_item_id, qty, unit_price) VALUES (?, ?, ?, ?)'),
   };
 
-  const view = (row) => ({
-    id: row.id,
-    name: row.name,
-    price: row.price,
-    priceVnd: Math.round(row.price * 1000),
-  });
+  const view = (row) => {
+    const priceVnd = row.price_vnd ?? (typeof row.price === 'number' ? Math.round(row.price * 1000) : null);
+    const price = row.price_vnd !== null && row.price_vnd !== undefined ? (row.price_vnd / 1000) : row.price;
+    return {
+      id: row.id,
+      name: row.name,
+      price: price,
+      priceVnd: priceVnd,
+    };
+  };
 
   async function handle(req, res) {
     const url = new URL(req.url, 'http://x');
@@ -104,8 +108,9 @@ export function createApp(db) {
         for (const { menuItemId, qty } of body.items) {
           const item = q.get.get(menuItemId);
           if (!item || !Number.isInteger(qty) || qty < 1) throw Object.assign(new Error(), { status: 400 });
-          q.insertLine.run(orderId, item.id, qty, item.price);
-          total += item.price * qty;
+          const price = item.price_vnd !== null && item.price_vnd !== undefined ? (item.price_vnd / 1000) : item.price;
+          q.insertLine.run(orderId, item.id, qty, price);
+          total += price * qty;
         }
         db.exec('COMMIT');
         return json(res, 201, { id: Number(orderId), total: Math.round(total * 1000) / 1000 });
