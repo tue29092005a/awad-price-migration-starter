@@ -1,0 +1,8 @@
+
+=== traffic start 2026-10-14T05:03:31.713Z · targets http://localhost:3001 http://localhost:3002 · new clients 0
+   5.1s ok=6091 error=0 contract=0 stale=0 unavailable=0 rerouted=0
+  10.1s ok=11916 error=0 contract=0 stale=0 unavailable=0 rerouted=0
+  15.1s ok=17856 error=0 contract=0 stale=0 unavailable=0 rerouted=0
+  20.1s ok=24324 error=0 contract=0 stale=0 unavailable=0 rerouted=0
+  25.1s ok=31051 error=0 contract=0 stale=0 unavailable=0 rerouted=0
+  30.1s ok=37300 error=0 contract=0 stale=0 unavailable=0 rerouted=0

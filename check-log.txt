@@ -1,0 +1,4 @@
+=== Step 0: Baseline (v1, 2 instances running) ===
+columns                id, name, price
+rows                   20000
+CONSISTENT
