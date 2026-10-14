@@ -45,3 +45,10 @@ db D:\CNTT\2026-2027\PTUDW\BTVN_migration_without_downtime\awad-price-migration-
 reverted 003_drop_price
 Status after revert 003:
 db D:\CNTT\2026-2027\PTUDW\BTVN_migration_without_downtime\awad-price-migration-starter\data\test_migration_003.db [x] 001_init [x] 002_add_price_vnd [ ] 003_drop_price
+
+=== Step 6: Contract Code (v4 deployed on both instances, neither reads nor writes price) ===
+columns                id, name, price, price_vnd rows                   72738 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
+
+=== Step 7: Contract Schema - Point of No Return (003_drop_price applied under traffic) ===
+applied  003_drop_price
+columns                id, name, price_vnd rows                   72738 price_vnd_null         0 price_vnd_not_integer  0 CONSISTENT
