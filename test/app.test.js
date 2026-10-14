@@ -22,19 +22,35 @@ const call = async (method, path, body) => {
   return { status: res.status, body: await res.json() };
 };
 
-test('GET /menu/:id returns price in thousands of dong', async () => {
-  assert.deepEqual(await call('GET', '/menu/1'), { status: 200, body: { id: 1, name: 'Phở bò', price: 45.5 } });
+test('GET /menu/:id returns price in thousands of dong and priceVnd', async () => {
+  assert.deepEqual(await call('GET', '/menu/1'), { status: 200, body: { id: 1, name: 'Phở bò', price: 45.5, priceVnd: 45500 } });
 });
 
-test('PATCH /menu/:id changes the price', async () => {
+test('PATCH /menu/:id changes the price with price', async () => {
   const r = await call('PATCH', '/menu/2', { price: 6 });
   assert.equal(r.status, 200);
   assert.equal(r.body.price, 6);
+  assert.equal(r.body.priceVnd, 6000);
+});
+
+test('PATCH /menu/:id changes the price with priceVnd', async () => {
+  const r = await call('PATCH', '/menu/2', { priceVnd: 7500 });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.price, 7.5);
+  assert.equal(r.body.priceVnd, 7500);
+});
+
+test('POST /menu creates an item with dual write', async () => {
+  const r = await call('POST', '/menu', { name: 'Bún chả', priceVnd: 55000 });
+  assert.equal(r.status, 201);
+  assert.equal(r.body.name, 'Bún chả');
+  assert.equal(r.body.price, 55);
+  assert.equal(r.body.priceVnd, 55000);
 });
 
 test('POST /orders totals at the current price', async () => {
   const r = await call('POST', '/orders', { items: [{ menuItemId: 1, qty: 2 }, { menuItemId: 2, qty: 1 }] });
-  assert.deepEqual(r, { status: 201, body: { id: 1, total: 97 } });
+  assert.deepEqual(r, { status: 201, body: { id: 1, total: 98.5 } });
 });
 
 test('errors have one shape', async () => {
