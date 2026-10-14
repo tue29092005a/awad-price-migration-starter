@@ -37,3 +37,11 @@ columns                id, name, price, price_vnd rows                   68757 p
 
 [After Roll Forward - Instances on v3]
 columns                id, name, price, price_vnd rows                   68996 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
+
+=== Verification of Migration 003 Down (on isolated test database) ===
+1. Applied all migrations up through 003:
+db D:\CNTT\2026-2027\PTUDW\BTVN_migration_without_downtime\awad-price-migration-starter\data\test_migration_003.db [x] 001_init [x] 002_add_price_vnd [x] 003_drop_price
+2. Reverted migration 003 (003_drop_price):
+reverted 003_drop_price
+Status after revert 003:
+db D:\CNTT\2026-2027\PTUDW\BTVN_migration_without_downtime\awad-price-migration-starter\data\test_migration_003.db [x] 001_init [x] 002_add_price_vnd [ ] 003_drop_price

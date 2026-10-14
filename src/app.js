@@ -39,24 +39,20 @@ function parsePrice(body) {
 
 export function createApp(db) {
   const q = {
-    list: db.prepare('SELECT id, name, price_vnd, price FROM menu_items ORDER BY id LIMIT ? OFFSET ?'),
-    get: db.prepare('SELECT id, name, price_vnd, price FROM menu_items WHERE id = ?'),
-    insert: db.prepare('INSERT INTO menu_items (name, price, price_vnd) VALUES (?, ?, ?)'),
-    setPrice: db.prepare('UPDATE menu_items SET price = ?, price_vnd = ? WHERE id = ?'),
+    list: db.prepare('SELECT id, name, price_vnd FROM menu_items ORDER BY id LIMIT ? OFFSET ?'),
+    get: db.prepare('SELECT id, name, price_vnd FROM menu_items WHERE id = ?'),
+    insert: db.prepare('INSERT INTO menu_items (name, price_vnd) VALUES (?, ?)'),
+    setPrice: db.prepare('UPDATE menu_items SET price_vnd = ? WHERE id = ?'),
     insertOrder: db.prepare("INSERT INTO orders (created_at) VALUES (datetime('now'))"),
     insertLine: db.prepare('INSERT INTO order_items (order_id, menu_item_id, qty, unit_price) VALUES (?, ?, ?, ?)'),
   };
 
-  const view = (row) => {
-    const priceVnd = row.price_vnd ?? (typeof row.price === 'number' ? Math.round(row.price * 1000) : null);
-    const price = row.price_vnd !== null && row.price_vnd !== undefined ? (row.price_vnd / 1000) : row.price;
-    return {
-      id: row.id,
-      name: row.name,
-      price: price,
-      priceVnd: priceVnd,
-    };
-  };
+  const view = (row) => ({
+    id: row.id,
+    name: row.name,
+    price: row.price_vnd / 1000,
+    priceVnd: row.price_vnd,
+  });
 
   async function handle(req, res) {
     const url = new URL(req.url, 'http://x');
@@ -77,7 +73,7 @@ export function createApp(db) {
         const priceInfo = parsePrice(body);
         if (!priceInfo)
           return error(res, 400, 'invalid_body', 'price (thousands of dong) or priceVnd (dong) is required');
-        const { lastInsertRowid } = q.insert.run(body.name, priceInfo.price, priceInfo.priceVnd);
+        const { lastInsertRowid } = q.insert.run(body.name, priceInfo.priceVnd);
         return json(res, 201, view(q.get.get(lastInsertRowid)));
       }
     }
@@ -92,7 +88,7 @@ export function createApp(db) {
         const priceInfo = parsePrice(body);
         if (!priceInfo)
           return error(res, 400, 'invalid_body', 'price (thousands of dong) or priceVnd (dong) is required');
-        q.setPrice.run(priceInfo.price, priceInfo.priceVnd, id);
+        q.setPrice.run(priceInfo.priceVnd, id);
         return json(res, 200, view(q.get.get(id)));
       }
     }
@@ -108,7 +104,7 @@ export function createApp(db) {
         for (const { menuItemId, qty } of body.items) {
           const item = q.get.get(menuItemId);
           if (!item || !Number.isInteger(qty) || qty < 1) throw Object.assign(new Error(), { status: 400 });
-          const price = item.price_vnd !== null && item.price_vnd !== undefined ? (item.price_vnd / 1000) : item.price;
+          const price = item.price_vnd / 1000;
           q.insertLine.run(orderId, item.id, qty, price);
           total += price * qty;
         }
