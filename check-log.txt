@@ -21,3 +21,6 @@ columns                id, name, price, price_vnd rows                   20797 p
 
 === Step 2: Dual Write (v2 deployed on both instances, NEW_CLIENTS=0.3) ===
 columns                id, name, price, price_vnd rows                   22747 price_vnd_null         18847 price_vnd_not_integer  0 disagree               0 CONSISTENT, but 18847 rows have no price_vnd yet GÇö nothing may read price_vnd until they do
+
+=== Step 3: Backfill (scripts/backfill.js completed under traffic) ===
+columns                id, name, price, price_vnd rows                   60729 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
