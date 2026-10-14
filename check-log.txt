@@ -27,3 +27,13 @@ columns                id, name, price, price_vnd rows                   60729 p
 
 === Step 4: Read New Column (v3 deployed on both instances) ===
 columns                id, name, price, price_vnd rows                   61998 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
+
+=== Step 5: The Way Back (Rollback v3 -> v2 and forward v2 -> v3 under live traffic) ===
+[Before Rollback - Instances on v3]
+columns                id, name, price, price_vnd rows                   68495 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
+
+[During Rollback - Instances on v2]
+columns                id, name, price, price_vnd rows                   68757 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
+
+[After Roll Forward - Instances on v3]
+columns                id, name, price, price_vnd rows                   68996 price_vnd_null         0 price_vnd_not_integer  0 disagree               0 CONSISTENT
