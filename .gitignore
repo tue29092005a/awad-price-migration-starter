@@ -2,4 +2,6 @@ node_modules/
 data/
 *.db
 *.db-*
-*.md
+homework_requirement.md
+how_to_run.md
+.new_clients
